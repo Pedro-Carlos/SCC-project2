@@ -21,6 +21,9 @@ public class AzureKeys {
     private String searchServiceUrl;
     private String indexName;
 
+    //mongoDB
+    private String mongoDbUrl;
+
     public static AzureKeys getInstance() {
 
         if (instance != null)
@@ -43,6 +46,8 @@ public class AzureKeys {
         this.searchServiceQueryKey = "Nt8MJDoj1hMLUNGDsiNL77GfOxWiiqptFjfXtuVZeSAzSeAiTrQ1";
         this.searchServiceUrl = "https://cg57778.search.windows.net";
         this.indexName ="cosmosdb-index" ;
+        //mongo
+        this.mongoDbUrl = "";
     }
 
 
@@ -84,6 +89,14 @@ public class AzureKeys {
 
     public void setCosmosDB(String cosmosDB) {
         this.cosmosDB = cosmosDB;
+    }
+
+    public String getMongoDbUrl() {
+        return mongoDbUrl;
+    }
+
+    public void setMongoDBUrl(String mongoDbUrl) {
+        this.mongoDbUrl = mongoDbUrl;
     }
 
     public String getRedisHostname() {
