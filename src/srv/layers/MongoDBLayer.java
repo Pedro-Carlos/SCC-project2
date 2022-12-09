@@ -15,6 +15,8 @@ import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import org.bson.Document;
+
 public class MongoDBLayer {
 
     public static final String USERS = "users";
@@ -66,11 +68,10 @@ public class MongoDBLayer {
         return res.getDeletedCount() == 1;
     }
 
-    public <T> String put(String container, T object) {
+    public <T> void put(String container, T object) {
         init();
-        InsertOneResult res = ((MongoCollection<T>)database.getCollection(container)).insertOne(object);
+        database.getCollection(container).insertOne((Document) object);
 
-        return res.toString();
     }
 
     public <T> T getById(String id, String containerType) {
@@ -78,12 +79,10 @@ public class MongoDBLayer {
         return (T) database.getCollection(containerType).find(eq("_id", id)).first();
     }
 
-    public <T> String replace(T object, String id, String container) {
+    public <T> void replace(T object, String id, String container) {
         if(delById(id, container)){
-            InsertOneResult res = ((MongoCollection<T>)database.getCollection(container)).insertOne(object);
-            return res.toString();
+            database.getCollection(container).insertOne((Document) object);
         }
-        return null;
     }
 
     public <T> FindIterable<T> getList(String containerType) {

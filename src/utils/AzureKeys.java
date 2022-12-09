@@ -33,15 +33,15 @@ public class AzureKeys {
         return instance;
     }
     public AzureKeys(){
-        this.blobKey = "DefaultEndpointsProtocol=https;AccountName=scc57778;AccountKey=/bn5jEszh5Jll9p+CkbH5xEu1xOcR0fjmzUiX800SmBCNaFz8wp0AhoLINB/bQsedmUKSL5FBTmF+AStcxLBQQ==;EndpointSuffix=core.windows.net";
+        this.blobKey = "DefaultEndpointsProtocol=https;AccountName=scc58175;AccountKey=6KFwdb7XsoHgIzv30VJaDq4qAf5zam+DgTBKblhmTT/iOBtLpusyRJwM0GJw3/wFcoXnvHg5LB/P+AStYTweCw==;EndpointSuffix=core.windows.net";
         this.replicationBlobKey = "";
         //cosmosKeys
-        this.cosmosDbKey = "jVsddXd9vKjNBHm8WJybVpiE0NvVslwnHPHm0pvWMI6tW6QShILWbzmkRe4o86EcvdFMhTrgz2hZACDb6ab5Cg==";
-        this.cosmosDbUrl = "https://scc2257778.documents.azure.com:443/";
+        this.cosmosDbKey = "O7CKkpE3OyC6KEU7bPzcQCkhKRmcc6xGj2WGyJIitrLYDoXhW6djmIdVHEevk9qqqiPRmDE3WGPpRP0rn1QhBg==";
+        this.cosmosDbUrl = "https://scc58175.documents.azure.com:443/";
         this.cosmosDB = "scc2223db";
         //cacheKeys
-        this.redisHostname = "scc2223cache57778.redis.cache.windows.net";
-        this.redisKey = "EgQUitxwZisoDmpjdfQZ3EI163xkbVXbhAzCaPFB4ME=";
+        this.redisHostname = "scc2223cache58175.redis.cache.windows.net";
+        this.redisKey = "03EQRxOuHn9F2zyxmXK55FxS7VtRf0da1AzCaIgqtRw=";
         //cognitiveSearchKeys
         this.searchServiceQueryKey = "Nt8MJDoj1hMLUNGDsiNL77GfOxWiiqptFjfXtuVZeSAzSeAiTrQ1";
         this.searchServiceUrl = "https://cg57778.search.windows.net";
