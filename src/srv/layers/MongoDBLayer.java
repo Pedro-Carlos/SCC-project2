@@ -15,6 +15,8 @@ import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import java.util.Arrays;
+
 import org.bson.Document;
 
 public class MongoDBLayer {
@@ -26,7 +28,7 @@ public class MongoDBLayer {
     public static final String GARBAGE = "garbage";
 
     public static final String URL = AzureKeys.getInstance().getMongoDbUrl();
-    public static final String DB_NAME ="databaseName";
+    public static final String DB_NAME ="admin";
 
     public MongoDBLayer(CodecRegistry codecRegis) {
         this.codecRegistry = codecRegis;
@@ -70,8 +72,10 @@ public class MongoDBLayer {
 
     public <T> void put(String container, T object) {
         init();
-        database.getCollection(container).insertOne((Document) object);
-
+        database.getCollection(container).insertOne(new Document()
+        .append("_id", "a")
+        .append("title", "Ski Bloopers")
+        .append("genres", Arrays.asList("Documentary", "Comedy")));
     }
 
     public <T> T getById(String id, String containerType) {

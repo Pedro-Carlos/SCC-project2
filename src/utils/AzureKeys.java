@@ -47,7 +47,7 @@ public class AzureKeys {
         this.searchServiceUrl = "https://cg57778.search.windows.net";
         this.indexName ="cosmosdb-index" ;
         //mongo
-        this.mongoDbUrl = "";
+        this.mongoDbUrl = "mongodb://root:example@mongo:27017/";
     }
 
 
