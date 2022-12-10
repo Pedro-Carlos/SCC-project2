@@ -9,7 +9,7 @@ import srv.data.user.User;
 import srv.data.user.UserDAO;
 import srv.layers.CosmosDBLayer;
 
-import javax.ws.rs.*;
+import jakarta.ws.rs.*;
 import java.util.UUID;
 
 @Path("/auth")
@@ -41,7 +41,7 @@ public class AuthenticationResource {
             cache.setSession(new Session(uid, u));
             return Response.ok().cookie(cookie).build();
         } else
-            throw new WebApplicationException(javax.ws.rs.core.Response.Status.FORBIDDEN);
+            throw new WebApplicationException(jakarta.ws.rs.core.Response.Status.FORBIDDEN);
     }
 
     public Session checkCookieUser(Cookie session, String id) throws jakarta.ws.rs.NotAuthorizedException {
