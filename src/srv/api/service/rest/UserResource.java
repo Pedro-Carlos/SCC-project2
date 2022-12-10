@@ -1,10 +1,11 @@
 package srv.api.service.rest;
 
+import com.mongodb.MongoException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
 import cache.RedisCache;
-import com.azure.cosmos.CosmosException;
+import com.mongodb.MongoException;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import com.mongodb.client.FindIterable;
 
@@ -15,7 +16,7 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import srv.api.service.rest.authentication.AuthenticationResource;
 import srv.layers.BlobStorageLayer;
-import srv.layers.CosmosDBLayer;
+import srv.layers.MongoDBLayer;
 import srv.layers.MongoDBLayer;
 import utils.Hash;
 import srv.data.auction.Auction;
@@ -75,16 +76,16 @@ public class UserResource {
         try {
             // Adds user to database
             user.setPwd(Hash.of(user.getPwd()));
-            db.put(CosmosDBLayer.USERS, new UserDAO(user));
+            db.put(MongoDBLayer.USERS, new UserDAO(user));
 
             // adds to cache
             if (cacheIsActive) {
-                UserDAO createdUser = db.getById(id, CosmosDBLayer.USERS);
+                UserDAO createdUser = db.getById(id, MongoDBLayer.USERS);
                 if (createdUser != null)
                     cache.set(id, user);
             }
-        } catch (CosmosException e) {
-            throw new WebApplicationException(e.getStatusCode());
+        } catch (MongoException e) {
+            throw new WebApplicationException(e.getCode());
         }
 
         // Adds user to database
@@ -102,7 +103,7 @@ public class UserResource {
         try {
 
             if(autheticationIsActive) auth.checkCookieUser(session, userId);
-            UserDAO user = db.getById(userId, CosmosDBLayer.USERS);
+            UserDAO user = db.getById(userId, MongoDBLayer.USERS);
             if (user == null)
                 throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -112,13 +113,13 @@ public class UserResource {
                     //cache.deleteSession(session.getValue());
                 }
 
-                db.delById(userId, CosmosDBLayer.USERS);
+                db.delById(userId, MongoDBLayer.USERS);
 
                 //put in garbage
-                db.put(CosmosDBLayer.GARBAGE, user);
+                db.put(MongoDBLayer.GARBAGE, user);
 
-            } catch (CosmosException e) {
-                throw new WebApplicationException(e.getStatusCode());
+            } catch (MongoException e) {
+                throw new WebApplicationException(e.getCode());
             }
         } catch (NotAuthorizedException e) {
             throw new NotAuthorizedException("Invalid user : " + userId);
@@ -147,7 +148,7 @@ public class UserResource {
                 }
                 UserDAO userDAO = null;
                 if (u == null) {
-                    userDAO = db.getById(userId, CosmosDBLayer.USERS);
+                    userDAO = db.getById(userId, MongoDBLayer.USERS);
                 }
 
                 if (userDAO == null && u == null) {
@@ -164,15 +165,15 @@ public class UserResource {
                     }
                 }
 
-                db.replace(user, userId, CosmosDBLayer.USERS);
+                db.replace(user, userId, MongoDBLayer.USERS);
 
                 // update cache
                 if (cacheIsActive) {
                     cache.delete(userId, User.class);
                     cache.set(userId, user);
                 }
-            } catch (CosmosException e) {
-                throw new WebApplicationException(e.getStatusCode());
+            } catch (MongoException e) {
+                throw new WebApplicationException(e.getCode());
             }
 
         } catch (NotAuthorizedException e) {
@@ -186,7 +187,7 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<User> listUsers() {
 
-        FindIterable<UserDAO> users = db.getList(CosmosDBLayer.USERS);
+        FindIterable<UserDAO> users = db.getList(MongoDBLayer.USERS);
 
         List<User> l = new ArrayList<>();
         for (UserDAO o : users) {
@@ -212,7 +213,7 @@ public class UserResource {
                 }
                 UserDAO userDAO = null;
                 if (u == null) {
-                    userDAO = db.getById(userId, CosmosDBLayer.USERS);
+                    userDAO = db.getById(userId, MongoDBLayer.USERS);
                 }
 
                 if (userDAO == null && u == null) {
@@ -221,7 +222,7 @@ public class UserResource {
 
                 List<Auction> l = new ArrayList<>();
 
-                FindIterable<AuctionDAO> auctions = db.getElementsFromObject(userId, CosmosDBLayer.AUCTIONS);
+                FindIterable<AuctionDAO> auctions = db.getElementsFromObject(userId, MongoDBLayer.AUCTIONS);
                 for (AuctionDAO o : auctions) {
                     l.add(new Auction(o));
                 }
@@ -229,8 +230,8 @@ public class UserResource {
                 return l;
 
 
-            } catch (CosmosException e) {
-                throw new WebApplicationException(e.getStatusCode());
+            } catch (MongoException e) {
+                throw new WebApplicationException(e.getCode());
             }
 
         } catch (NotAuthorizedException e) {

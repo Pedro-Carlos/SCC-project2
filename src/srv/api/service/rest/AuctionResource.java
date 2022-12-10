@@ -5,6 +5,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import com.mongodb.client.FindIterable;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -19,7 +20,6 @@ import jakarta.ws.rs.core.MediaType;
 import srv.data.user.User;
 import srv.data.user.UserDAO;
 import srv.layers.BlobStorageLayer;
-import srv.layers.CosmosDBLayer;
 import srv.data.auction.Auction;
 import srv.data.auction.AuctionDAO;
 import srv.data.bid.Bid;
@@ -27,11 +27,12 @@ import srv.data.bid.BidDAO;
 import srv.data.questions.Questions;
 import srv.data.questions.QuestionsDAO;
 import srv.api.service.rest.authentication.AuthenticationResource;
+import srv.layers.MongoDBLayer;
 
 @Path("/auction")
 public class AuctionResource {
     private BlobStorageLayer blob = BlobStorageLayer.getInstance(false);
-    private CosmosDBLayer db = CosmosDBLayer.getInstance();
+    private MongoDBLayer db = MongoDBLayer.getInstance();
     private RedisCache cache = RedisCache.getInstance();
 
     private AuthenticationResource auth = new AuthenticationResource();
@@ -97,7 +98,7 @@ public class AuctionResource {
             }
             UserDAO userDAO = null;
             if (u == null) {
-                userDAO = db.getById(auctionOwner, CosmosDBLayer.USERS, UserDAO.class);
+                userDAO = db.getById(auctionOwner, MongoDBLayer.USERS);
             }
             if (u == null && userDAO == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -105,11 +106,11 @@ public class AuctionResource {
 
             try {
                 // Adds auction to database
-                db.put(CosmosDBLayer.AUCTIONS, new AuctionDAO(auction));
+                db.put(MongoDBLayer.AUCTIONS, new AuctionDAO(auction));
 
                 // adds to cache in function
                 if (cacheIsActive) {
-                    AuctionDAO createdAuction = db.getById(id, CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+                    AuctionDAO createdAuction = db.getById(id, MongoDBLayer.AUCTIONS);
                     if (createdAuction != null) {
                         cache.set(id, auction);
                         // update time of user in cache
@@ -162,12 +163,12 @@ public class AuctionResource {
 
                 UserDAO userDAO = null;
                 if (user == null) {
-                    userDAO = db.getById(auction.getOwnerId(), CosmosDBLayer.USERS, UserDAO.class);
+                    userDAO = db.getById(auction.getOwnerId(), MongoDBLayer.USERS);
                 }
 
                 AuctionDAO auctionDAO = null;
                 if (a == null) {
-                    auctionDAO = db.getById(id, CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+                    auctionDAO = db.getById(id, MongoDBLayer.AUCTIONS);
                 }
 
                 if ((userDAO == null && user == null) || (auctionDAO == null && a == null)) {
@@ -194,7 +195,7 @@ public class AuctionResource {
                     cache.delete(auction.getOwnerId(), User.class);
                 }
 
-                db.replace(new AuctionDAO(auction), id, CosmosDBLayer.AUCTIONS);
+                db.replace(new AuctionDAO(auction), id, MongoDBLayer.AUCTIONS);
                 // insert in cache in function
                 if (cacheIsActive) {
                     cache.set(id, auction);
@@ -215,7 +216,7 @@ public class AuctionResource {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Auction> listAuctions() {
-        CosmosPagedIterable<AuctionDAO> auctions = db.getList(CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+        FindIterable<AuctionDAO> auctions = db.getList(MongoDBLayer.AUCTIONS);
         List<Auction> l = new ArrayList<>();
         for (AuctionDAO o : auctions) {
             l.add(new Auction(o));
@@ -231,7 +232,7 @@ public class AuctionResource {
     public List<Auction> getAuctionsAboutToClose() {
         List<Auction> l = new ArrayList<>();
 
-        CosmosPagedIterable<AuctionDAO> auctions = db.getList(CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+        FindIterable<AuctionDAO> auctions = db.getList(MongoDBLayer.AUCTIONS);
         for (AuctionDAO auction : auctions) {
             long diff = ChronoUnit.MINUTES.between(LocalDateTime.now().toInstant(ZoneOffset.of("+00:00")),
                     auction.getEndDateTime().toInstant());
@@ -270,7 +271,7 @@ public class AuctionResource {
                     throw new WebApplicationException(Status.CONFLICT);
                 }
             }
-            if(db.getById(id, CosmosDBLayer.BIDS, BidDAO.class) != null){
+            if(db.getById(id, MongoDBLayer.BIDS) != null){
                 throw new WebApplicationException(Status.CONFLICT);
             }
 
@@ -283,12 +284,12 @@ public class AuctionResource {
 
             UserDAO userDAO = null;
             if (user == null) {
-                userDAO = db.getById(bid.getBidderId(), CosmosDBLayer.USERS, UserDAO.class);
+                userDAO = db.getById(bid.getBidderId(), MongoDBLayer.USERS);
             }
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
             }
 
             if ((userDAO == null && user == null) || (auctionDAO == null && a == null)) {
@@ -305,10 +306,10 @@ public class AuctionResource {
             }
 
             try {
-                db.put(CosmosDBLayer.BIDS, new BidDAO(bid));
+                db.put(MongoDBLayer.BIDS, new BidDAO(bid));
                 // adds to cache in function
                 if (cacheIsActive) {
-                    BidDAO createdBid = db.getById(id, CosmosDBLayer.BIDS, BidDAO.class);
+                    BidDAO createdBid = db.getById(id, MongoDBLayer.BIDS);
                     if (createdBid != null) {
                         cache.set(id, bid);
                         // update time of auction in cache
@@ -345,7 +346,7 @@ public class AuctionResource {
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
             }
             if (a == null && auctionDAO == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -353,7 +354,7 @@ public class AuctionResource {
 
             List<Bid> l = new ArrayList<>();
 
-            CosmosPagedIterable<BidDAO> bids = db.getElementsFromObject(auctionId, CosmosDBLayer.BIDS, BidDAO.class);
+            FindIterable<BidDAO> bids = db.getElementsFromObject(auctionId, MongoDBLayer.BIDS);
 
             for (BidDAO o : bids) {
                 l.add(new Bid(o));
@@ -389,7 +390,7 @@ public class AuctionResource {
                     throw new WebApplicationException(Status.CONFLICT);
                 }
             }
-            if(db.getById(id, CosmosDBLayer.QUESTIONS, QuestionsDAO.class) != null){
+            if(db.getById(id, MongoDBLayer.QUESTIONS) != null){
                 throw new WebApplicationException(Status.CONFLICT);
             }
 
@@ -402,12 +403,12 @@ public class AuctionResource {
 
             UserDAO userDAO = null;
             if (user == null) {
-                userDAO = db.getById(question.getUserId(), CosmosDBLayer.USERS, UserDAO.class);
+                userDAO = db.getById(question.getUserId(), MongoDBLayer.USERS);
             }
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
             }
 
             if ((userDAO == null && user == null) || (auctionDAO == null && a == null)) {
@@ -424,10 +425,10 @@ public class AuctionResource {
             }
 
             try {
-                db.put(CosmosDBLayer.QUESTIONS, new QuestionsDAO(question));
+                db.put(MongoDBLayer.QUESTIONS, new QuestionsDAO(question));
 
                 if (cacheIsActive) {
-                    QuestionsDAO createdQuestion = db.getById(id, CosmosDBLayer.QUESTIONS, QuestionsDAO.class);
+                    QuestionsDAO createdQuestion = db.getById(id, MongoDBLayer.QUESTIONS);
                     if (createdQuestion != null) {
                         cache.set(id, question);
                         // update time of auction in cache
@@ -461,7 +462,7 @@ public class AuctionResource {
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, CosmosDBLayer.AUCTIONS, AuctionDAO.class);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
             }
             if (a == null && auctionDAO == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -469,8 +470,7 @@ public class AuctionResource {
 
             List<Questions> l = new ArrayList<>();
 
-            CosmosPagedIterable<QuestionsDAO> questions = db.getElementsFromObject(auctionId, CosmosDBLayer.QUESTIONS,
-                    QuestionsDAO.class);
+            FindIterable<QuestionsDAO> questions = db.getElementsFromObject(auctionId, MongoDBLayer.QUESTIONS);
 
             for (QuestionsDAO o : questions) {
                 l.add(new Questions(o));

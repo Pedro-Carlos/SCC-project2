@@ -60,7 +60,7 @@ public class MongoDBLayer {
 
     public <T> boolean delById(String id, String container) {
         init();
-        DeleteResult res = database.getCollection(container).deleteOne(eq("_id", id));
+        DeleteResult res = database.getCollection(container).deleteOne(eq("id", id));
         /*
         Returns:A document containing:
            A boolean acknowledged as true if the operation ran with write concern or false if write concern was disabled
@@ -73,17 +73,13 @@ public class MongoDBLayer {
 
     public <T> void put(String container, T object) {
         init();
-/*        database.getCollection(container).insertOne(new Document()
-        .append("_id", "a")
-        .append("title", "Ski Bloopers")
-        .append("genres", Arrays.asList("Documentary", "Comedy")));*/
         ((MongoCollection<T>) database.getCollection(container)).insertOne(object);
 
     }
 
     public <T> T getById(String id, String containerType) {
         init();
-        return (T) database.getCollection(containerType).find(eq("_id", id)).first();
+        return (T) database.getCollection(containerType).find(eq("id", id)).first();
     }
 
     public <T> void replace(T object, String id, String container) {

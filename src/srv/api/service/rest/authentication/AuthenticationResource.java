@@ -5,9 +5,7 @@ import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-import srv.data.user.User;
 import srv.data.user.UserDAO;
-import srv.layers.CosmosDBLayer;
 
 import jakarta.ws.rs.*;
 import java.util.UUID;

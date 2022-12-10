@@ -52,7 +52,7 @@ spec:
         app: redis
     spec:
       nodeSelector:
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       containers:
         - name: redis
           image: docker.io/redis:7.0.5
@@ -107,10 +107,10 @@ spec:
         app: app-scc
     spec:
       nodeSelector:
-        "beta.kubernetes.io/os": linux
+        "kubernetes.io/os": linux
       containers:
         - name: app-scc
-          image: pedrocarlos57778/scc2223-app:latest
+          image: pedrocarlos57778/app-scc:latest
           imagePullPolicy: Always
           volumeMounts: #code for DISK in app
             - mountPath: "/mnt/vol"                #code for DISK in app
