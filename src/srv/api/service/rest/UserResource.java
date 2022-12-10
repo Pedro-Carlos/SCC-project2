@@ -1,7 +1,7 @@
 package srv.api.service.rest;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response.Status;
 
 import cache.RedisCache;
 import com.azure.cosmos.CosmosException;

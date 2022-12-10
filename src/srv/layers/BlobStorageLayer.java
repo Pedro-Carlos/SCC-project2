@@ -3,8 +3,8 @@ package srv.layers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response.Status;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.*;

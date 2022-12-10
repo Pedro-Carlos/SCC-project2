@@ -1,49 +1,107 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: azure-vote-front
+  name: redis-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: azure-vote-front
+      app: redis-app
   template:
     metadata:
       labels:
-        app: azure-vote-front
+        app: redis-app
     spec:
       nodeSelector:
         "beta.kubernetes.io/os": linux
       containers:
-        - name: azure-vote-front
-          image: mcr.microsoft.com/azuredocs/azure-vote-front:v1
-          volumeMounts:                               #code for DISK in app
-            - mountPath: "/mnt/vol"                   #code for DISK in app
+        - name: azure-vote-back
+          image: docker.io/redis:7.0.5
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 6379
+              name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-app
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: redis-app
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-scc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-scc
+  template:
+    metadata:
+      labels:
+        app: app-scc
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: app-scc
+          image: pedrocarlos57778/scc2223-app:latest
+          volumeMounts: #code for DISK in app
+            - mountPath: "/data/media"                #code for DISK in app
               name: mediavolume                       #code for DISK in app
           resources:
-            requests:                                 #values of cpu and memory increase 2x because
-              cpu: 200m                               #should be higher than the cache values
-              memory: 256Mi                           #since it's the application and handles more requests?!
-            limits:                                   #NOT SURE
-              cpu: 500m
-              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
           ports:
-            - containerPort: 80
-          env:                                        #code for CACHE in app
-            - name: REDIS                             #code for CACHE in app
-              value: "azure-vote-back"                #code for CACHE in app
-      volumes:                                        #code for DISK in app
+            - containerPort: 8080
+          env:
+            - name: REDIS
+              value: "redis-app"
+      volumes: #code for DISK in app
         - name: mediavolume                           #code for DISK in app
-          persistentVolumeClaim:                      #code for DISK in app
+          persistentVolumeClaim: #code for DISK in app
             claimName: azure-managed-disk             #code for DISK in app
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: azure-vote-front
+  name: app-scc
 spec:
   type: LoadBalancer
   ports:
     - port: 80
+      targetPort: 8080
   selector:
-    app: azure-vote-front
+    app: app-scc
+
+
