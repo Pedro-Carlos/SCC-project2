@@ -27,7 +27,6 @@ import srv.data.bid.BidDAO;
 import srv.data.questions.Questions;
 import srv.data.questions.QuestionsDAO;
 import srv.api.service.rest.authentication.AuthenticationResource;
-import srv.api.service.rest.cognitiveSearch.CognitiveSearch;
 
 @Path("/auction")
 public class AuctionResource {
@@ -37,7 +36,7 @@ public class AuctionResource {
 
     private AuthenticationResource auth = new AuthenticationResource();
 
-    private CognitiveSearch cognitiveSearch = CognitiveSearch.getInstance();
+
 
 
 /*    public static final String ABOUT_TO_CLOSE_AUCTIONS = "AboutToCloseAuctions";
@@ -481,34 +480,6 @@ public class AuctionResource {
         } catch (CosmosException e) {
             throw new WebApplicationException(e.getStatusCode());
         }
-    }
-
-    @GET
-    @Path("{OWNER_ID}/search")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<List<Map.Entry<String, Object>>> searchAuctions(@CookieParam("scc:session") Cookie session, @PathParam("OWNER_ID") String ownerId, @QueryParam("searchFilter") String searchFilter) {
-        if (ownerId == null || searchFilter == null)
-            throw new WebApplicationException(Status.BAD_REQUEST);
-
-       User a = null;
-       if (cacheIsActive) {
-           a = cache.get(ownerId, User.class);
-       }
-
-       UserDAO userDAO = null;
-       if (a == null) {
-           userDAO = db.getById(ownerId, CosmosDBLayer.USERS, UserDAO.class);
-       }
-       if (a == null && userDAO == null) {
-           throw new WebApplicationException(Status.NOT_FOUND);
-       }
-
-        try {
-            //auth.checkCookieUser(session, auction.getOwnerId());
-        } catch (NotAuthorizedException e) {
-            throw new NotAuthorizedException("Invalid user : " + a != null ? a.getId() : userDAO.getId());
-        }
-        return cognitiveSearch.search(searchFilter, ownerId);
     }
 
 

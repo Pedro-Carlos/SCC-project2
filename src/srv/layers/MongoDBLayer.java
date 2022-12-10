@@ -27,7 +27,7 @@ public class MongoDBLayer {
     public static final String QUESTIONS = "questions";
     public static final String GARBAGE = "garbage";
 
-    public static final String URL = AzureKeys.getInstance().getMongoDbUrl();
+    //public static final String URL = AzureKeys.getInstance().getMongoDbUrl();
     public static final String DB_NAME ="admin";
 
     public MongoDBLayer(CodecRegistry codecRegis) {
@@ -52,7 +52,8 @@ public class MongoDBLayer {
     private synchronized void init() {
         if (database != null)
             return;
-        MongoClient mongoClient = MongoClients.create(URL);
+        String mongoDB_URI = System.getenv("MONGODB");
+        MongoClient mongoClient = MongoClients.create(mongoDB_URI);
         database = mongoClient.getDatabase(DB_NAME).withCodecRegistry(codecRegistry);
 
     }

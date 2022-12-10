@@ -1,21 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-app
+  name: mongodb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis-app
+      app: mongodb
   template:
     metadata:
       labels:
-        app: redis-app
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:4.4
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 27017
+              name: mongodb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  ports:
+    - port: 27017
+  selector:
+    app: mongodb
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
     spec:
       nodeSelector:
         "beta.kubernetes.io/os": linux
       containers:
-        - name: azure-vote-back
+        - name: redis
           image: docker.io/redis:7.0.5
           env:
             - name: ALLOW_EMPTY_PASSWORD
@@ -34,12 +73,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-app
+  name: redis
 spec:
   ports:
     - port: 6379
   selector:
-    app: redis-app
+    app: redis
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -58,7 +97,7 @@ kind: Deployment
 metadata:
   name: app-scc
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: app-scc
@@ -73,7 +112,7 @@ spec:
         - name: app-scc
           image: pedrocarlos57778/scc2223-app:latest
           volumeMounts: #code for DISK in app
-            - mountPath: "/data/media"                #code for DISK in app
+            - mountPath: "/mnt/vol"                #code for DISK in app
               name: mediavolume                       #code for DISK in app
           resources:
             requests:
@@ -87,6 +126,8 @@ spec:
           env:
             - name: REDIS
               value: "redis-app"
+            - name: MONGODB
+              value: "mongodb:27017"
       volumes: #code for DISK in app
         - name: mediavolume                           #code for DISK in app
           persistentVolumeClaim: #code for DISK in app
@@ -99,7 +140,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 80
+    - port: 8080
       targetPort: 8080
   selector:
     app: app-scc

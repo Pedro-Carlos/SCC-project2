@@ -7,9 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import srv.api.service.rest.cognitiveSearch.CognitiveSearch;
-import srv.data.auction.Auction;
-import srv.data.bid.Bid;
 import srv.api.service.rest.authentication.Session;
 import srv.data.user.User;
 import utils.AzureKeys;
@@ -27,8 +24,8 @@ public class RedisCache {
 	No need to have all elements in list, bad usage of cache I think
 	LIST_ABOUT_TO_CLOSE needs to have lower limit since auctions in this list are been closed frequently
 	 */
-	public static final String HOST_NAME = AzureKeys.getInstance().getRedisHostname();
-	public static final String KEY = AzureKeys.getInstance().getRedisKey();
+	//public static final String HOST_NAME = AzureKeys.getInstance().getRedisHostname();
+	//public static final String KEY = AzureKeys.getInstance().getRedisKey();
 
 	private static JedisPool instance;
 	private static RedisCache cache;
@@ -45,7 +42,8 @@ public class RedisCache {
 		poolConfig.setTestWhileIdle(true);
 		poolConfig.setNumTestsPerEvictionRun(3);
 		poolConfig.setBlockWhenExhausted(true);
-		instance = new JedisPool(poolConfig, HOST_NAME, 6379, 1000);
+		String redisHost = System.getenv("REDIS");
+		instance = new JedisPool(poolConfig, redisHost, 6379, 1000);
 		return instance;
 
 	}
