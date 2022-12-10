@@ -111,6 +111,7 @@ spec:
       containers:
         - name: app-scc
           image: pedrocarlos57778/scc2223-app:latest
+          imagePullPolicy: Always
           volumeMounts: #code for DISK in app
             - mountPath: "/mnt/vol"                #code for DISK in app
               name: mediavolume                       #code for DISK in app

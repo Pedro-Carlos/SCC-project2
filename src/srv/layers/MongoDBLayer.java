@@ -73,10 +73,12 @@ public class MongoDBLayer {
 
     public <T> void put(String container, T object) {
         init();
-        database.getCollection(container).insertOne(new Document()
+/*        database.getCollection(container).insertOne(new Document()
         .append("_id", "a")
         .append("title", "Ski Bloopers")
-        .append("genres", Arrays.asList("Documentary", "Comedy")));
+        .append("genres", Arrays.asList("Documentary", "Comedy")));*/
+        ((MongoCollection<T>) database.getCollection(container)).insertOne(object);
+
     }
 
     public <T> T getById(String id, String containerType) {
@@ -86,7 +88,7 @@ public class MongoDBLayer {
 
     public <T> void replace(T object, String id, String container) {
         if(delById(id, container)){
-            database.getCollection(container).insertOne((Document) object);
+            ((MongoCollection<T>) database.getCollection(container)).insertOne(object);
         }
     }
 
