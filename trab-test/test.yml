@@ -1,0 +1,171 @@
+config:
+  target: 'https://scc-project-57672.azurewebsites.net/rest'
+  http:
+    timeout: 15
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+  processor: "./test-utils.js"
+  variables:
+    numUsers : 8
+    numAuctions : 5
+    maxBids : 3  # number of bids
+    maxQuestions : 2 # number of questions
+  
+  phases:
+  - name: "Test"
+    duration: 1
+    arrivalCount: 1
+
+scenarios:
+  - name: 'Test'
+    weight: 1
+    flow:
+      - loop:                            
+        - post:                          
+            url: "/media/"
+            name: "POST:/media/"
+            headers:
+              Content-Type: application/octet-stream
+              Accept: application/json
+            beforeRequest: "uploadImageBody"
+            capture: 
+              regexp: "(.+)"
+              as: "imageId"              
+        - function: "genNewUser"         
+        - post:                         # Create users
+            url: "/user/"
+            name: "POST:/user/"
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+            json:
+              id: "{{ id }}"
+              name: "{{ name }}"
+              nickName: "{{ nickName }}"
+              pwd: "{{ pwd }}"
+              photoId: "{{ imageId }}"
+            afterResponse: "genNewUserReply"    
+        count: "{{ numUsers }}"
+      - get:
+            url: "/user/"
+            afterResponse: "genUserList"
+      - loop:                            
+        - function: "selectUserSkewed"
+        - function: "genNewAuction"
+        - post:                         
+            url: "/media/"
+            name: "POST:/media/"
+            headers:
+              Content-Type: application/octet-stream
+              Accept: application/json
+            beforeRequest: "uploadImageBody"
+            capture: 
+              regexp: "(.+)"
+              as: "imageId"             
+        - post:                          # Create auction
+            url: "/auction/"
+            name: "POST:/auction/"
+            headers:
+              Content-Type: application/json
+              Accept: application/json
+            json:
+              id: "{{ idAuction }}"
+              description: "{{ description }}"
+              ownerId: "{{ user }}"
+              imageId: "{{ imageId }}"
+              price: "{{ price }}"
+              winnerBidId: "{{ winnerBidId }}"
+              status: "{{ status }}"
+              endDateTime: "{{ endDateTime }}"
+            capture:                     
+              - json: $.id
+                as: "auctionId"
+              - json: $.ownerId
+                as: "auctionUser"
+        count: "{{ numAuctions }}"
+      - loop:                         
+          - function: "selectUserSkewed"
+          - function: "genNewBid"
+          - post:                          # New bid     
+              url: "/auction/{{ auctionId }}/bid/"
+              name: "POST:/auction/*/bid/"
+              headers:
+                Content-Type: application/json
+                Accept: application/json
+              json:
+                id: "{{ idBid }}"
+                bidderId: "{{ user }}"
+                auctionId: "{{ auctionId }}"
+                value: "{{ value }}"
+        count: "{{ maxBids }}"   
+      - loop:                          
+          - function: "selectUserSkewed"
+          - function: "genNewQuestion"
+          - post:                          # New question     
+              url: "/auction/{{ auctionId }}/question/"
+              name: "POST:/auction/*/question/"
+              headers:
+                Content-Type: application/json
+                Accept: application/json
+              json:
+                id: "{{ idQuestion }}"
+                userId: "{{ user }}"
+                auctionId: "{{ auctionId }}"
+                message: "{{ message }}"
+              capture:                     
+                - json: $.id
+                  as: "questionId"
+        count: "{{ maxQuestions }}"  
+      - get:                          # List auctions
+            url: "/auction/"
+            name: "GET:/auction/"
+            afterResponse: "genAuctionList"
+      - get:                          # List about to close auctions
+            url: "/auction/AboutToClose/"
+            name: "GET:/auction/AboutToClose/"
+            afterResponse: "genAuctionsAboutToCloseList"
+      - get:                          # List bids of an auction
+            url: "/auction/{{ auctionId }}/listBids"
+            name: "GET:/auction/*/listBids"
+            afterResponse: "genBidsList"
+      - get:                          # List questions of an auction
+            url: "/auction/{{ auctionId }}/listQuestions"
+            name: "GET:/auction/*/listQuestions"
+            afterResponse: "genQuestionsList"
+      - function: "selectUserSkewed"
+      - get:                          # List of auctions from a user
+            url: "/user/{{ user }}/auctions"
+            name: "GET:/user/*/auctions"
+            afterResponse: "genUserAuctionsList"
+      - loop:                     
+          - function: "selectUserSkewed"
+          - function: "genNewUpdatedUser"
+          - put:                      # Update user
+              url: "/user/{{ user }}"  
+              name: "PUT:/user/*"
+              headers:
+                Content-Type: application/json
+                Accept: application/json
+              json:
+                id: "{{ user }}"
+                name: "{{ name }}"
+                nickName: "{{ nickName }}"
+                pwd: "{{ pwd }}"
+                photoId: "{{ imageId }}"
+        count: 2
+      - loop:
+          - function: "selectUserSkewed"
+          - delete:                    # Delete user
+              url: "/user/{{ user }}"
+              name: "DELETE:/user/*"  
+        count: 2
+      - function: "selectUserSkewed"
+      - get:                           # Cognitive Search
+            url: "/auctions/{{ user }}/search?searchFilter={{{ description }}}"
+            name: "GET:/auctions/*/search"
+
+          
+
+
+         
