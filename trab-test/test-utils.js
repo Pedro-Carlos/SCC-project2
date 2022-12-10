@@ -68,10 +68,10 @@ function randomSkewed( val){
 // Loads data about images from disk
 function loadData() {
 	var basedir
-	if( fs.existsSync( '/trab-test-finished/images')) 
-		basedir = '/trab-test-finished/images'
+	if( fs.existsSync( '/trab-test/images')) 
+		basedir = '/trab-test/images'
 	else
-		basedir =  'trab-test-finished/images'	
+		basedir =  'trab-test/images'	
 	fs.readdirSync(basedir).forEach( file => {
 		if( path.extname(file) === ".jpeg") {
 			var img  = fs.readFileSync(basedir + "/" + file)
