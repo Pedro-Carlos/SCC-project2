@@ -104,8 +104,8 @@ public class MongoDBLayer {
 
     private String getElementsFromObject(String containerType) {
         if (AUCTIONS.equals(containerType))
-            return "ownerId";
-        return "auctionId";
+            return "_ownerId";
+        return "_auctionId";
     }
     /**
      * USED IN FUNCTIONS
