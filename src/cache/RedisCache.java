@@ -1,18 +1,11 @@
 package cache;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import srv.api.service.rest.authentication.Session;
-import srv.data.user.User;
-import utils.AzureKeys;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /*import static srv.api.service.rest.AuctionResource.ABOUT_TO_CLOSE_AUCTIONS;*/
 

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: docker.io/mongo:6.0.3
+          image: docker.io/mongo:4.4
           resources:
             requests:
               cpu: 1000m
@@ -33,6 +33,7 @@ metadata:
 spec:
   ports:
     - port: 27017
+      targetPort: 27017
   selector:
     app: mongodb
 
@@ -77,6 +78,7 @@ metadata:
 spec:
   ports:
     - port: 6379
+      targetPort: 6379
   selector:
     app: redis
 ---
