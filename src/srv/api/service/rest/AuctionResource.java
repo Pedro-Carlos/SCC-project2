@@ -19,7 +19,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import srv.data.user.User;
 import srv.data.user.UserDAO;
-import srv.layers.BlobStorageLayer;
+import srv.layers.PersistentVolume;
 import srv.data.auction.Auction;
 import srv.data.auction.AuctionDAO;
 import srv.data.bid.Bid;
@@ -31,7 +31,7 @@ import srv.layers.MongoDBLayer;
 
 @Path("/auction")
 public class AuctionResource {
-    private BlobStorageLayer blob = BlobStorageLayer.getInstance(false);
+    private PersistentVolume blob = PersistentVolume.getInstance();
     private MongoDBLayer db = MongoDBLayer.getInstance();
     private RedisCache cache = RedisCache.getInstance();
 
@@ -98,7 +98,7 @@ public class AuctionResource {
             }
             UserDAO userDAO = null;
             if (u == null) {
-                userDAO = db.getById(auctionOwner, MongoDBLayer.USERS);
+                userDAO = db.getById(auctionOwner, MongoDBLayer.USERS, UserDAO.class);
             }
             if (u == null && userDAO == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -110,7 +110,7 @@ public class AuctionResource {
 
                 // adds to cache in function
                 if (cacheIsActive) {
-                    AuctionDAO createdAuction = db.getById(id, MongoDBLayer.AUCTIONS);
+                    AuctionDAO createdAuction = db.getById(id, MongoDBLayer.AUCTIONS, AuctionDAO.class);
                     if (createdAuction != null) {
                         cache.set(id, auction);
                         // update time of user in cache
@@ -163,12 +163,12 @@ public class AuctionResource {
 
                 UserDAO userDAO = null;
                 if (user == null) {
-                    userDAO = db.getById(auction.getOwnerId(), MongoDBLayer.USERS);
+                    userDAO = db.getById(auction.getOwnerId(), MongoDBLayer.USERS, UserDAO.class);
                 }
 
                 AuctionDAO auctionDAO = null;
                 if (a == null) {
-                    auctionDAO = db.getById(id, MongoDBLayer.AUCTIONS);
+                    auctionDAO = db.getById(id, MongoDBLayer.AUCTIONS, AuctionDAO.class);
                 }
 
                 if ((userDAO == null && user == null) || (auctionDAO == null && a == null)) {
@@ -216,7 +216,7 @@ public class AuctionResource {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Auction> listAuctions() {
-        FindIterable<AuctionDAO> auctions = db.getList(MongoDBLayer.AUCTIONS);
+        FindIterable<AuctionDAO> auctions = db.getList(MongoDBLayer.AUCTIONS, AuctionDAO.class);
         List<Auction> l = new ArrayList<>();
         for (AuctionDAO o : auctions) {
             l.add(new Auction(o));
@@ -232,7 +232,7 @@ public class AuctionResource {
     public List<Auction> getAuctionsAboutToClose() {
         List<Auction> l = new ArrayList<>();
 
-        FindIterable<AuctionDAO> auctions = db.getList(MongoDBLayer.AUCTIONS);
+        FindIterable<AuctionDAO> auctions = db.getList(MongoDBLayer.AUCTIONS, AuctionDAO.class);
         for (AuctionDAO auction : auctions) {
             long diff = ChronoUnit.MINUTES.between(LocalDateTime.now().toInstant(ZoneOffset.of("+00:00")),
                     auction.getEndDateTime().toInstant());
@@ -271,7 +271,7 @@ public class AuctionResource {
                     throw new WebApplicationException(Status.CONFLICT);
                 }
             }
-            if(db.getById(id, MongoDBLayer.BIDS) != null){
+            if(db.getById(id, MongoDBLayer.BIDS, BidDAO.class) != null){
                 throw new WebApplicationException(Status.CONFLICT);
             }
 
@@ -284,12 +284,12 @@ public class AuctionResource {
 
             UserDAO userDAO = null;
             if (user == null) {
-                userDAO = db.getById(bid.getBidderId(), MongoDBLayer.USERS);
+                userDAO = db.getById(bid.getBidderId(), MongoDBLayer.USERS, UserDAO.class);
             }
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS, AuctionDAO.class);
             }
 
             if ((userDAO == null && user == null) || (auctionDAO == null && a == null)) {
@@ -309,7 +309,7 @@ public class AuctionResource {
                 db.put(MongoDBLayer.BIDS, new BidDAO(bid));
                 // adds to cache in function
                 if (cacheIsActive) {
-                    BidDAO createdBid = db.getById(id, MongoDBLayer.BIDS);
+                    BidDAO createdBid = db.getById(id, MongoDBLayer.BIDS, BidDAO.class);
                     if (createdBid != null) {
                         cache.set(id, bid);
                         // update time of auction in cache
@@ -346,7 +346,7 @@ public class AuctionResource {
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS, AuctionDAO.class);
             }
             if (a == null && auctionDAO == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -354,7 +354,7 @@ public class AuctionResource {
 
             List<Bid> l = new ArrayList<>();
 
-            FindIterable<BidDAO> bids = db.getElementsFromObject(auctionId, MongoDBLayer.BIDS);
+            FindIterable<BidDAO> bids = db.getElementsFromObject(auctionId, MongoDBLayer.BIDS, BidDAO.class);
 
             for (BidDAO o : bids) {
                 l.add(new Bid(o));
@@ -390,7 +390,7 @@ public class AuctionResource {
                     throw new WebApplicationException(Status.CONFLICT);
                 }
             }
-            if(db.getById(id, MongoDBLayer.QUESTIONS) != null){
+            if(db.getById(id, MongoDBLayer.QUESTIONS, QuestionsDAO.class) != null){
                 throw new WebApplicationException(Status.CONFLICT);
             }
 
@@ -403,12 +403,12 @@ public class AuctionResource {
 
             UserDAO userDAO = null;
             if (user == null) {
-                userDAO = db.getById(question.getUserId(), MongoDBLayer.USERS);
+                userDAO = db.getById(question.getUserId(), MongoDBLayer.USERS, UserDAO.class);
             }
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS, AuctionDAO.class);
             }
 
             if ((userDAO == null && user == null) || (auctionDAO == null && a == null)) {
@@ -428,7 +428,7 @@ public class AuctionResource {
                 db.put(MongoDBLayer.QUESTIONS, new QuestionsDAO(question));
 
                 if (cacheIsActive) {
-                    QuestionsDAO createdQuestion = db.getById(id, MongoDBLayer.QUESTIONS);
+                    QuestionsDAO createdQuestion = db.getById(id, MongoDBLayer.QUESTIONS, QuestionsDAO.class);
                     if (createdQuestion != null) {
                         cache.set(id, question);
                         // update time of auction in cache
@@ -462,7 +462,7 @@ public class AuctionResource {
 
             AuctionDAO auctionDAO = null;
             if (a == null) {
-                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS);
+                auctionDAO = db.getById(auctionId, MongoDBLayer.AUCTIONS, AuctionDAO.class);
             }
             if (a == null && auctionDAO == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -470,7 +470,7 @@ public class AuctionResource {
 
             List<Questions> l = new ArrayList<>();
 
-            FindIterable<QuestionsDAO> questions = db.getElementsFromObject(auctionId, MongoDBLayer.QUESTIONS);
+            FindIterable<QuestionsDAO> questions = db.getElementsFromObject(auctionId, MongoDBLayer.QUESTIONS, QuestionsDAO.class);
 
             for (QuestionsDAO o : questions) {
                 l.add(new Questions(o));

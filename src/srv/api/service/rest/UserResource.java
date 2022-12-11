@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import srv.api.service.rest.authentication.AuthenticationResource;
-import srv.layers.BlobStorageLayer;
+import srv.layers.PersistentVolume;
 import srv.layers.MongoDBLayer;
 import srv.layers.MongoDBLayer;
 import utils.Hash;
@@ -34,7 +34,7 @@ import java.util.UUID;
 
 @Path("/user")
 public class UserResource {
-    private BlobStorageLayer blob = BlobStorageLayer.getInstance(false);
+    private PersistentVolume blob = PersistentVolume.getInstance();
     private MongoDBLayer db = MongoDBLayer.getInstance();
     private RedisCache cache = RedisCache.getInstance();
 
@@ -80,7 +80,7 @@ public class UserResource {
 
             // adds to cache
             if (cacheIsActive) {
-                UserDAO createdUser = db.getById(id, MongoDBLayer.USERS);
+                UserDAO createdUser = db.getById(id, MongoDBLayer.USERS, UserDAO.class);
                 if (createdUser != null)
                     cache.set(id, user);
             }
@@ -103,7 +103,7 @@ public class UserResource {
         try {
 
             if(autheticationIsActive) auth.checkCookieUser(session, userId);
-            UserDAO user = db.getById(userId, MongoDBLayer.USERS);
+            UserDAO user = db.getById(userId, MongoDBLayer.USERS, UserDAO.class);
             if (user == null)
                 throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -113,7 +113,7 @@ public class UserResource {
                     //cache.deleteSession(session.getValue());
                 }
 
-                db.delById(userId, MongoDBLayer.USERS);
+                db.delById(userId, MongoDBLayer.USERS, UserDAO.class);
 
                 //put in garbage
                 db.put(MongoDBLayer.GARBAGE, user);
@@ -148,7 +148,7 @@ public class UserResource {
                 }
                 UserDAO userDAO = null;
                 if (u == null) {
-                    userDAO = db.getById(userId, MongoDBLayer.USERS);
+                    userDAO = db.getById(userId, MongoDBLayer.USERS, UserDAO.class);
                 }
 
                 if (userDAO == null && u == null) {
@@ -187,7 +187,7 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<User> listUsers() {
 
-        FindIterable<UserDAO> users = db.getList(MongoDBLayer.USERS);
+        FindIterable<UserDAO> users = db.getList(MongoDBLayer.USERS, UserDAO.class);
 
         List<User> l = new ArrayList<>();
         for (UserDAO o : users) {
@@ -213,7 +213,7 @@ public class UserResource {
                 }
                 UserDAO userDAO = null;
                 if (u == null) {
-                    userDAO = db.getById(userId, MongoDBLayer.USERS);
+                    userDAO = db.getById(userId, MongoDBLayer.USERS, UserDAO.class);
                 }
 
                 if (userDAO == null && u == null) {
@@ -222,7 +222,7 @@ public class UserResource {
 
                 List<Auction> l = new ArrayList<>();
 
-                FindIterable<AuctionDAO> auctions = db.getElementsFromObject(userId, MongoDBLayer.AUCTIONS);
+                FindIterable<AuctionDAO> auctions = db.getElementsFromObject(userId, MongoDBLayer.AUCTIONS, AuctionDAO.class);
                 for (AuctionDAO o : auctions) {
                     l.add(new Auction(o));
                 }

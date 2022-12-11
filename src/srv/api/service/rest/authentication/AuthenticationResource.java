@@ -8,12 +8,14 @@ import jakarta.ws.rs.core.Response;
 import srv.data.user.UserDAO;
 
 import jakarta.ws.rs.*;
+import srv.layers.MongoDBLayer;
+
 import java.util.UUID;
 
 @Path("/auth")
 public class AuthenticationResource {
 
-    private CosmosDBLayer db = CosmosDBLayer.getInstance();
+    private MongoDBLayer db = MongoDBLayer.getInstance();
     private RedisCache cache = RedisCache.getInstance();
 
     public AuthenticationResource() {
@@ -24,7 +26,7 @@ public class AuthenticationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response auth(Login user) {
 
-        UserDAO u = db.getById(user.getId(), CosmosDBLayer.USERS, UserDAO.class);
+        UserDAO u = db.getById(user.getId(), MongoDBLayer.USERS, UserDAO.class);
 
         if (user.getPwd().equals(u.getPwd())) {
             String uid = UUID.randomUUID().toString();

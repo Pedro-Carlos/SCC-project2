@@ -1,6 +1,6 @@
 package srv.api.service.rest;
 
-import srv.layers.BlobStorageLayer;
+import srv.layers.PersistentVolume;
 import utils.Hash;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/media")
 public class MediaResource {
 
-    BlobStorageLayer blob = BlobStorageLayer.getInstance(false);
+    PersistentVolume blob = PersistentVolume.getInstance();
 
     /**
      * Uploads content

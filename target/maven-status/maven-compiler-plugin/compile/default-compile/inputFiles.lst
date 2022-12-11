@@ -1,25 +1,23 @@
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\authentication\Login.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\layers\MongoDBLayer.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\ControlResource.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\user\UserDAO.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\bid\BidDAO.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\AuctionResource.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\bid\Bid.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\authentication\AuthenticationResource.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\cache\RedisCache.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\cognitiveSearch\CognitiveSearch.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\user\User.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\utils\Hash.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\authentication\Session.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\questions\Questions.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\utils\AzureKeys.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\authentication\LoginDAO.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\UserResource.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\layers\CosmosDBLayer.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\impl\MainApplication.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\layers\BlobStorageLayer.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\api\service\rest\MediaResource.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\auction\AuctionDAO.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\auction\Auction.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\utils\AzureProperties.java
-C:\Users\jpareis\Desktop\Cloud\SCC-project2\src\srv\data\questions\QuestionsDAO.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\questions\QuestionsDAO.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\impl\MainApplication.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\authentication\Login.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\layers\PersistentVolume.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\bid\BidDAO.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\ControlResource.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\utils\AzureProperties.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\utils\Hash.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\auction\Auction.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\AuctionResource.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\bid\Bid.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\cache\RedisCache.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\authentication\AuthenticationResource.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\user\User.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\MediaResource.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\authentication\Session.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\layers\MongoDBLayer.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\auction\AuctionDAO.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\questions\Questions.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\UserResource.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\data\user\UserDAO.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\srv\api\service\rest\authentication\LoginDAO.java
+C:\Users\Pedro Carlos\Desktop\4ano-1semestre\SCC\Pratica\tp2\project\src\utils\AzureKeys.java

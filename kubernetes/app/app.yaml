@@ -14,14 +14,14 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: mongo:4.4
+          image: docker.io/mongo:6.0.3
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 1000m
+              memory: 1000Mi
             limits:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 2000m
+              memory: 2000Mi
           ports:
             - containerPort: 27017
               name: mongodb
@@ -117,11 +117,11 @@ spec:
               name: mediavolume                       #code for DISK in app
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 200m
+              memory: 400Mi
             limits:
-              cpu: 250m
-              memory: 256Mi
+              cpu: 1000m
+              memory: 1000Mi
           ports:
             - containerPort: 8080
           env:

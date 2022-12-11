@@ -1,24 +1,19 @@
 package srv.layers;
 
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import static com.mongodb.client.model.Filters.eq;
+
 import com.mongodb.client.*;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.InsertOneResult;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
-import utils.AzureKeys;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.InsertOneResult;
 
-
-import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static com.mongodb.client.model.Filters.eq;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
-import java.util.Arrays;
-
-import org.bson.Document;
-
+@SuppressWarnings("ALL")
 public class MongoDBLayer {
 
     public static final String USERS = "users";
@@ -28,7 +23,9 @@ public class MongoDBLayer {
     public static final String GARBAGE = "garbage";
 
     //public static final String URL = AzureKeys.getInstance().getMongoDbUrl();
-    public static final String DB_NAME ="admin";
+    public static final String DB_NAME ="data";
+    private static final String CONNECTION_STRING ="mongodb://mongodb:27017";
+
 
     public MongoDBLayer(CodecRegistry codecRegis) {
         this.codecRegistry = codecRegis;
@@ -52,15 +49,15 @@ public class MongoDBLayer {
     private synchronized void init() {
         if (database != null)
             return;
-        String mongoDB_URI = System.getenv("MONGODB");
-        MongoClient mongoClient = MongoClients.create(mongoDB_URI);
+
+        MongoClient mongoClient = MongoClients.create(CONNECTION_STRING);
         database = mongoClient.getDatabase(DB_NAME).withCodecRegistry(codecRegistry);
 
     }
 
-    public <T> boolean delById(String id, String container) {
+    public <T> boolean delById(String id, String container, Class<T> objectClass) {
         init();
-        DeleteResult res = database.getCollection(container).deleteOne(eq("id", id));
+        DeleteResult res = database.getCollection(container, objectClass).deleteOne(eq("_id", id));
         /*
         Returns:A document containing:
            A boolean acknowledged as true if the operation ran with write concern or false if write concern was disabled
@@ -71,31 +68,32 @@ public class MongoDBLayer {
         return res.getDeletedCount() == 1;
     }
 
-    public <T> void put(String container, T object) {
+    public <T> String put(String container, T object) {
         init();
-        ((MongoCollection<T>) database.getCollection(container)).insertOne(object);
+        InsertOneResult res = ((MongoCollection<T>) database.getCollection(container, object.getClass())).insertOne(object);
+        return res.getInsertedId().toString();
 
     }
 
-    public <T> T getById(String id, String containerType) {
+    public <T> T getById(String id, String containerType, Class<T> objectClass) {
         init();
-        return (T) database.getCollection(containerType).find(eq("id", id)).first();
+        return database.getCollection(containerType, objectClass).find(eq("_id", id)).first();
     }
 
     public <T> void replace(T object, String id, String container) {
-        if(delById(id, container)){
-            ((MongoCollection<T>) database.getCollection(container)).insertOne(object);
+        if(delById(id, container, object.getClass())){
+            ((MongoCollection<T>) database.getCollection(container, object.getClass())).insertOne(object);
         }
     }
 
-    public <T> FindIterable<T> getList(String containerType) {
+    public <T> FindIterable<T> getList(String containerType, Class<T> objectClass) {
         init();
-        return ((MongoCollection<T>) database.getCollection(containerType)).find();
+        return database.getCollection(containerType, objectClass).find();
     }
 
-    public <T> FindIterable<T> getElementsFromObject(String parentId, String containerType) {
+    public <T> FindIterable<T> getElementsFromObject(String parentId, String containerType, Class<T> objectClass) {
         init();
-        return ((MongoCollection<T>) database.getCollection(containerType)).find(eq(getElementsFromObject(containerType), parentId));
+        return database.getCollection(containerType, objectClass).find(eq(getElementsFromObject(containerType), parentId));
     }
 
     private String getElementsFromObject(String containerType) {

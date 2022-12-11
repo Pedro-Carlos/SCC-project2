@@ -1,5 +1,8 @@
 package srv.data.user;
 
+
+import org.bson.Document;
+
 import java.util.Arrays;
 
 /**
@@ -79,5 +82,17 @@ public class UserDAO {
 		return "UserDAO [_rid=" + _rid + ", _ts=" + _ts + ", id=" + id + ", name=" + name +", nickName=" + nickName + ", pwd=" + pwd
 				+ ", photoId=" + photoId + "]";
 	}
+
+	public Document toDocument() {
+		Document doc = new Document();
+		doc.put("_ts", this._ts);
+		doc.put("id", this.id);
+		doc.put("name", this.name);
+		doc.put("nickName", this.nickName);
+		doc.put("pwd", this.pwd);
+		doc.put("photoId", this.photoId);
+		return doc;
+	}
+
 
 }
